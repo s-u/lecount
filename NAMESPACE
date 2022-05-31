@@ -1,0 +1,3 @@
+useDynLib(lecount, C_lecount)
+export(lecount)
+import(BH)
