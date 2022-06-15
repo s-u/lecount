@@ -19,7 +19,7 @@ int opt_verbose = 0;
 extern "C" SEXP C_lecount(SEXP sMatrix, SEXP sN) {
     bool *matrix;
     LECOptions options;
-    unsigned long long count;
+    size_t count;
     size_t n = (size_t) Rf_asReal(sN), N = n * n, i = 0;
     int *v;
     /* our R wrapper actually guarantees this, but just in case .. */
@@ -27,7 +27,6 @@ extern "C" SEXP C_lecount(SEXP sMatrix, SEXP sN) {
 	Rf_error("Invalid matrix, must be a square integer matrix.");
     v = INTEGER(sMatrix);
     
-    memset(&options, 0, sizeof(options));
     /* FIXME: pass options from R */
     
     /* copy R integer representation to a bool array */
@@ -36,11 +35,11 @@ extern "C" SEXP C_lecount(SEXP sMatrix, SEXP sN) {
 	matrix[i] = v[i] ? true : false;
 	i++;
     }
-    
-    LinearExtensionCounterAuto<unsigned long long> lec(n);
+
+    LinearExtensionCounterAuto<size_t> lec(n);
     lec.options = options;
     count = lec.count(matrix);
-    
+
     delete [] matrix;
     return
 	(count < (1 << 31)) ?
