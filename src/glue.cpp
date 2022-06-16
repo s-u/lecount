@@ -9,6 +9,10 @@
 #include <iostream>
 #include <numeric>
 #include <string>
+
+/* for large counts use mpz_class from gmp */
+#include <gmpxx.h>
+
 #include "digraph.hpp"
 
 #include <Rinternals.h>
@@ -19,7 +23,7 @@ int opt_verbose = 0;
 extern "C" SEXP C_lecount(SEXP sMatrix, SEXP sN) {
     bool *matrix;
     LECOptions options;
-    size_t count;
+    mpz_class count;
     size_t n = (size_t) Rf_asReal(sN), N = n * n, i = 0;
     int *v;
     /* our R wrapper actually guarantees this, but just in case .. */
@@ -36,13 +40,11 @@ extern "C" SEXP C_lecount(SEXP sMatrix, SEXP sN) {
 	i++;
     }
 
-    LinearExtensionCounterAuto<size_t> lec(n);
+    LinearExtensionCounterAuto<mpz_class> lec(n);
     lec.options = options;
     count = lec.count(matrix);
 
     delete [] matrix;
-    return
-	(count < (1 << 31)) ?
-	Rf_ScalarInteger((int) count) :
-	Rf_ScalarReal((double) count);
+
+    return mkString(count.get_str().c_str());
 }
