@@ -1,1 +1,1 @@
-LIBS=-lgmpxx -lgmp
+PKG_LIBS=-lgmpxx -lgmp
